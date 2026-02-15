@@ -1,0 +1,21 @@
+﻿algo: ddpg
+seed: 42
+n_envs: 4
+total_timesteps: 350000
+policy: MlpPolicy
+learning_rate: 0.0003
+buffer_size: 500000
+learning_starts: 10000
+batch_size: 512
+gamma: 0.99
+tau: 0.005
+train_freq: [1, step]
+gradient_steps: 1
+action_noise_sigma: 0.10
+policy_kwargs:
+  net_arch: [256, 256]
+verbose: 1
+device: auto
+log_interval: 10
+checkpoint_freq: 50000
+eval_freq: 25000

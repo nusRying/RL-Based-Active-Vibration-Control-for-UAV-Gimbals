@@ -1,0 +1,32 @@
+﻿[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rl-avc-gimbal"
+version = "0.1.0"
+description = "RL-based active vibration control scaffold for UAV gimbals."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "gymnasium>=0.29.1",
+  "numpy>=1.24.0",
+  "PyYAML>=6.0.1",
+  "stable-baselines3>=2.3.2",
+  "torch>=2.2.0",
+  "onnx>=1.15.0",
+  "onnxruntime>=1.17.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[project.scripts]
+train-avc = "rl_avc_gimbal.training.train:main"
+eval-avc = "rl_avc_gimbal.training.evaluate:main"
+export-avc-onnx = "rl_avc_gimbal.deployment.export_onnx:main"
+analyze-avc-freq = "rl_avc_gimbal.training.frequency_analysis:main"
+build-avc-dataset = "rl_avc_gimbal.training.build_dataset:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
