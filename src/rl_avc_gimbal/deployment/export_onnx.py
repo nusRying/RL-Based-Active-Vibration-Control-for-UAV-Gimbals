@@ -4,10 +4,13 @@ import argparse
 from pathlib import Path
 
 import torch
-from stable_baselines3 import DDPG, SAC
 
 from rl_avc_gimbal.config import ensure_dir, load_yaml
 from rl_avc_gimbal.envs import GimbalAVCEnv
+from rl_avc_gimbal.runtime_compat import prepare_runtime_compat
+
+prepare_runtime_compat()
+from stable_baselines3 import DDPG, SAC
 
 
 class ActorWrapper(torch.nn.Module):

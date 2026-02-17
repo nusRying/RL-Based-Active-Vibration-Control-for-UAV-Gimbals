@@ -7,10 +7,12 @@ from statistics import mean, pstdev
 from typing import Any
 
 import numpy as np
-from stable_baselines3 import DDPG, SAC
-
 from rl_avc_gimbal.config import load_yaml
 from rl_avc_gimbal.envs import GimbalAVCEnv
+from rl_avc_gimbal.runtime_compat import prepare_runtime_compat
+
+prepare_runtime_compat()
+from stable_baselines3 import DDPG, SAC
 
 
 def _model_cls(algo: str):

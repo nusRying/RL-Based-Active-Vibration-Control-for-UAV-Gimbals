@@ -65,6 +65,29 @@ S_{uu}[k] = U[k]U^*[k],\quad S_{yu}[k] = Y[k]U^*[k]
 
 `src/rl_avc_gimbal/training/frequency_analysis.py` implements this exactly.
 
+## 3.1 Sampling Constraints (Critical)
+
+Frequency analysis is limited by sampling rate:
+\[
+f_s=\frac{1}{dt},\quad f_N=\frac{f_s}{2}
+\]
+where \(f_N\) is Nyquist frequency.
+
+For current default runtime:
+- `dt = 0.005` s
+- `f_s = 200` Hz
+- `f_N = 100` Hz
+
+Implication:
+- A target band of `100-400 Hz` is **not** fully observable at 200 Hz.
+- Only the 100 Hz edge can appear, which collapses band statistics.
+
+To analyze up to 400 Hz, use at least:
+- `f_s >= 800` Hz (`dt <= 0.00125` s)
+- practical recommendation: `f_s = 1000` Hz (`dt = 0.001` s) for margin.
+
+If staying at 200 Hz, analyze a valid band such as `10-90 Hz`.
+
 ## 4) How Reward Terms Shape Frequency Response
 
 Reward in environment:
@@ -146,8 +169,8 @@ Step 2: Run frequency analysis in target band.
 ```powershell
 python scripts/analyze_frequency.py `
   --rollout-npz runs/sac_baseline/rollout_ep0.npz `
-  --band-min-hz 100 `
-  --band-max-hz 400 `
+  --band-min-hz 10 `
+  --band-max-hz 90 `
   --save-json runs/sac_baseline/frequency_summary.json `
   --save-csv runs/sac_baseline/frequency_trace.csv
 ```

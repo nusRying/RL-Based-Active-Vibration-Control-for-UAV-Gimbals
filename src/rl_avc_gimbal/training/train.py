@@ -6,14 +6,16 @@ from typing import Any
 
 import numpy as np
 import yaml
+from rl_avc_gimbal.config import ensure_dir, load_yaml
+from rl_avc_gimbal.envs import GimbalAVCEnv
+from rl_avc_gimbal.runtime_compat import prepare_runtime_compat
+
+prepare_runtime_compat()
 from stable_baselines3 import DDPG, SAC
 from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback, EvalCallback
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor
-
-from rl_avc_gimbal.config import ensure_dir, load_yaml
-from rl_avc_gimbal.envs import GimbalAVCEnv
 
 
 def _as_train_freq(value: Any) -> tuple[int, str] | None:

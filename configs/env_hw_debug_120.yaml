@@ -1,0 +1,39 @@
+# Debug environment profile for fast iteration visibility.
+# With dt=0.005 and episode_seconds=0.6, each episode has 120 steps.
+
+dt: 0.005
+episode_seconds: 0.6
+history_length: 8
+termination_max_angle_rad: 0.9
+imu_noise_std: 0.02
+
+torque_limit_nm: [0.45, 0.45, 0.30]
+inertia_kgm2: [0.014, 0.013, 0.009]
+damping: [0.10, 0.10, 0.08]
+stiffness: [0.75, 0.75, 0.55]
+target_angles_rad: [0.0, 0.0, 0.0]
+lever_arm_m: 0.08
+
+weights:
+  accel: 1.0
+  position: 0.30
+  chatter: 0.02
+
+disturbance:
+  enabled: true
+  frequency_hz: [100.0, 400.0]
+  amplitude: [0.18, 0.18, 0.12]
+  gaussian_std: 0.03
+
+domain_randomization:
+  payload_mass_kg: [0.30, 0.70]
+  mount_stiffness_scale: [0.85, 1.15]
+  damping_scale: [0.92, 1.10]
+
+hybrid_control:
+  enabled: true
+  pid_kp: [4.0, 4.0, 3.2]
+  pid_ki: [0.2, 0.2, 0.2]
+  pid_kd: [0.12, 0.12, 0.09]
+  integral_limit: [0.30, 0.30, 0.20]
+  rl_delta_scale: [0.20, 0.20, 0.20]

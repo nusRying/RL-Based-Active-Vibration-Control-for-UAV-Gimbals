@@ -36,6 +36,7 @@ Why RL instead of only PID/LQR:
 6. Run inference loop on onboard computer and wire telemetry/actuation transport
    (`src/rl_avc_gimbal/deployment/mavlink_runtime_stub.py`).
 7. Optionally merge rollout logs into a reusable dataset (`scripts/build_dataset.py`).
+8. Compose a hardware-specific env config (`scripts/compose_env.py`).
 
 This maps directly to:
 - Phase 1 (modeling): `src/rl_avc_gimbal/sim/digital_twin.py`
@@ -397,14 +398,16 @@ CLI wrappers:
 - `scripts/export_onnx.py`
 - `scripts/analyze_frequency.py`
 - `scripts/build_dataset.py`
+- `scripts/compose_env.py`
+- `scripts/check_env.py`
+- `scripts/probe_env.py`
 
 ## 8) Training, Evaluation, and Export Commands
 
-When you are ready to install dependencies later:
+Use your existing Conda environment:
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
+conda activate comp_vision
 pip install -r requirements.txt
 pip install -e .
 ```
@@ -456,11 +459,16 @@ Analyze frequency response:
 ```powershell
 python scripts/analyze_frequency.py `
   --rollout-npz runs/sac_baseline/rollout_ep0.npz `
-  --band-min-hz 100 `
-  --band-max-hz 400 `
+  --band-min-hz 10 `
+  --band-max-hz 90 `
   --save-json runs/sac_baseline/frequency_summary.json `
   --save-csv runs/sac_baseline/frequency_trace.csv
 ```
+
+Sampling note:
+- Frequency analysis is limited by Nyquist (`f_N = 1/(2*dt)`).
+- With default `dt=0.005`, `f_N=100 Hz`, so `100-400 Hz` is not fully observable.
+- Use `10-90 Hz` at current `dt`, or reduce `dt` (increase sample rate) for higher bands.
 
 Build merged dataset (optional):
 
@@ -469,6 +477,30 @@ python scripts/build_dataset.py `
   --glob "runs/*/rollout_ep0.npz" `
   --output datasets/avc_merged.npz `
   --save-report-json datasets/avc_merged_report.json
+```
+
+Compose hardware env config:
+
+```powershell
+python scripts/compose_env.py `
+  --base configs/env.yaml `
+  --profile configs/env_hw_profile.yaml `
+  --output configs/env_hw_merged.yaml
+```
+
+Check `comp_vision` environment health:
+
+```powershell
+python scripts/check_env.py --save-json runs/env_report.json
+```
+
+Probe episode completion (useful before RLlib/PPO runs):
+
+```powershell
+python scripts/probe_env.py `
+  --env-config configs/env_hw_merged.yaml `
+  --episodes 5 `
+  --policy random
 ```
 
 ## 9) Evaluation Metrics
@@ -553,16 +585,27 @@ configs/
   env.yaml
   sac.yaml
   ddpg.yaml
+  env_hw_profile.example.yaml
+  env_hw_profile.yaml
+  env_hw_merged.yaml
+  env_hw_debug_120.yaml
 docs/
   frequency_response_appendix.md
   tuning_playbook.md
   dataset_collection.md
+  hardware_kickoff_checklist.md
+  comp_vision_env_notes.md
+  rllib_debug_next_steps.md
+  sac_hw_short_baseline.md
 scripts/
   train.py
   eval.py
   export_onnx.py
   analyze_frequency.py
   build_dataset.py
+  compose_env.py
+  check_env.py
+  probe_env.py
 src/rl_avc_gimbal/
   controllers/
   deployment/
@@ -581,3 +624,11 @@ tests/
   `docs/tuning_playbook.md`
 - Optional rollout dataset workflow:
   `docs/dataset_collection.md`
+- Hardware kickoff and calibration checklist:
+  `docs/hardware_kickoff_checklist.md`
+- `comp_vision` dependency troubleshooting:
+  `docs/comp_vision_env_notes.md`
+- RLlib-specific debug flow for zero reward/length:
+  `docs/rllib_debug_next_steps.md`
+- Recorded baseline metrics from first SAC hardware-profile run:
+  `docs/sac_hw_short_baseline.md`

@@ -215,7 +215,14 @@ class GimbalAVCEnv(gym.Env[np.ndarray, np.ndarray]):
             "theta": state.theta.copy(),
             "theta_dot": state.theta_dot.copy(),
             "imu_accel": state.imu_accel.copy(),
+            "step_count": self.step_count,
         }
+        if terminated:
+            info["done_reason"] = "angle_limit"
+        elif truncated:
+            info["done_reason"] = "horizon"
+        else:
+            info["done_reason"] = "running"
         return self._get_obs(), reward, terminated, truncated, info
 
     def render(self) -> None:
